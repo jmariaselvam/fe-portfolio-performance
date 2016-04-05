@@ -421,39 +421,28 @@ var resizePizzas = function(size) {
 
   changeSliderLabel(size);
 
-   // Returns the size difference to change a pizza element from one size to another. Called by changePizzaSlices(size).
-  function determineDx (elem, size) {
-    var oldWidth = elem.offsetWidth;
-    var windowWidth = document.querySelector("#randomPizzas").offsetWidth;
-    var oldSize = oldWidth / windowWidth;
-
-    // TODO: change to 3 sizes? no more xl?
-    // Changes the slider value to a percent width
-    function sizeSwitcher (size) {
-      switch(size) {
-        case "1":
-          return 0.25;
-        case "2":
-          return 0.3333;
-        case "3":
-          return 0.5;
-        default:
-          console.log("bug in sizeSwitcher");
-      }
-    }
-
-    var newSize = sizeSwitcher(size);
-    var dx = (newSize - oldSize) * windowWidth;
-
-    return dx;
-  }
-
   // Iterates through pizza elements on the page and changes their widths
   function changePizzaSizes(size) {
-    for (var i = 0; i < document.querySelectorAll(".randomPizzaContainer").length; i++) {
-      var dx = determineDx(document.querySelectorAll(".randomPizzaContainer")[i], size);
-      var newwidth = (document.querySelectorAll(".randomPizzaContainer")[i].offsetWidth + dx) + 'px';
-      document.querySelectorAll(".randomPizzaContainer")[i].style.width = newwidth;
+    //No longer using the determineDx() function because of Forced Reflow
+    var newWidth = 0;
+    switch(size) {
+      case "1":
+        newWidth = 25;
+        break;
+      case "2":
+        newWidth = 33;
+        break;
+      case "3":
+        newWidth = 50;
+        break;
+      default:
+        console.log("bug in sizeSwitcher");
+    }
+
+    newWidth = newWidth + '%';
+    var randomPizzaContainers = document.getElementsByClassName("randomPizzaContainer");
+    for (var i = 0; i < randomPizzaContainers.length; i++) {
+      randomPizzaContainers[i].style.width = newWidth;
     }
   }
 
@@ -502,10 +491,30 @@ function updatePositions() {
   frame++;
   window.performance.mark("mark_start_frame");
 
-  var items = document.querySelectorAll('.mover');
+  //This should not have been in the loop: Causes Forced reflow
+  var scrollTopConstant = (document.body.scrollTop / 1250);
+  //There can only be a maximum of 5 phases per frame so calculate it outside the loop
+  var PIX = 'px';
+  var FACTOR = 100;
+  var offsetLeftsInPixels = [Math.sin(scrollTopConstant) * FACTOR,
+                                Math.sin(scrollTopConstant + 1) * FACTOR,
+                                Math.sin(scrollTopConstant + 2) * FACTOR,
+                                Math.sin(scrollTopConstant + 3) * FACTOR,
+                                Math.sin(scrollTopConstant + 4) * FACTOR];
+
+  // Using getElementsByClassName() for performance tuning. Converting a DynamicNodeList to an array before manipulating it.
+  var itemList = document.getElementsByClassName('mover');
+  var items = [];
+  var calculatedLeftValues = [];
+  for (var i = 0; i < itemList.length; i++) {
+    items[i] = itemList[i];
+    //Avoid Forced reflow by doing the calculations before changing styles
+    calculatedLeftValues[i] = items[i].basicLeft + offsetLeftsInPixels[i%5] + PIX;
+  }
+
+  //Batch update Styles
   for (var i = 0; i < items.length; i++) {
-    var phase = Math.sin((document.body.scrollTop / 1250) + (i % 5));
-    items[i].style.left = items[i].basicLeft + 100 * phase + 'px';
+    items[i].style.left = calculatedLeftValues[i];
   }
 
   // User Timing API to the rescue again. Seriously, it's worth learning.
@@ -525,7 +534,9 @@ window.addEventListener('scroll', updatePositions);
 document.addEventListener('DOMContentLoaded', function() {
   var cols = 8;
   var s = 256;
-  for (var i = 0; i < 200; i++) {
+  //Makes sense to reduce the number of pizza elements being created. Only a small number of them are shown on the screen at any given time.
+  //A goog tip given on the forums. Thanks!
+  for (var i = 0; i < 50; i++) {
     var elem = document.createElement('img');
     elem.className = 'mover';
     elem.src = "images/pizza.png";
