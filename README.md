@@ -48,4 +48,4 @@ You can access the optimised pizza page at localhost:8080/views/pizza.html
 
 ####Part 4: Optimised Site
 
-A publicly available optimised site is available at [Optimised Portfolio](http://448df3e9.ngrok.io).
+A publicly available optimised site is available at [Optimised Portfolio](http://jmariaselvam.github.io/portfolio).
