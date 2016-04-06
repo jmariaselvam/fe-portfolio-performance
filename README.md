@@ -19,6 +19,7 @@ I used Gulp as the build tool.
     $>gulp clean
 
     ```
+    
 ####Part 2: Optimize PageSpeed Insights score for index.html
 
 To run the application:
