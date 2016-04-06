@@ -7,18 +7,18 @@ I used Gulp as the build tool.
 1. Check out the repository.
 1. Run the following command to minimise source files, optimise images and inline CSS.
 
-    '''
+    ```
     $>cd /path/to/your-project-folder
     $>gulp
 
-    '''
+    ```
 1. To clean your dist folder, run the following command.
 
-    '''
+    ```
     $>cd /path/to/your-project-folder
     $>gulp clean
 
-    '''
+    ```
 ####Part 2: Optimize PageSpeed Insights score for index.html
 
 To run the application:
@@ -32,7 +32,7 @@ To run the application:
   ```
 
 1. Open a browser and visit localhost:8080 OR
-1. Download and install [ngrok](https://ngrok.com/) to make your local server accessible remotely.
+1. Download and install [ngrok](http://jmariaselvam.github.io) to make your local server accessible remotely.
 
   ``` bash
   $> cd /path/to/your-ngrok-executable
